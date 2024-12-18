@@ -10,6 +10,7 @@ from clearml import Task
 import sys
 import gymnasium as gym
 import tensorflow
+from typing_extensions import TypeIs
 
 # Env
 env = OT2Env()
