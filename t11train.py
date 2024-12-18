@@ -15,8 +15,7 @@ import tensorflow
 env = OT2Env()
 
 # ClearML
-task = Task.init(project_name="Mentor Group E/Group 3", task_name="OT2_RL_Training",
-                 docker_virtualenv='/root/.clearml/venvs-builds/3.10/bin/python')
+task = Task.init(project_name="Mentor Group E/Group 3", task_name="OT2_RL_Training")
 task.set_base_docker('deanis/2023y2b-rl:latest')
 task.execute_remotely(queue_name="default")
 
