@@ -1,0 +1,28 @@
+{
+  "os": "Linux-5.15.0-125-generic-x86_64-with-glibc2.35",
+  "python": "CPython 3.11.0rc1",
+  "startedAt": "2024-12-18T10:54:38.820182Z",
+  "program": "/home/y2b/t11train.py",
+  "codePath": "t11train.py",
+  "email": "232345@buas.nl",
+  "root": "/home/y2b",
+  "host": "8b36b08521ad",
+  "username": "root",
+  "executable": "/usr/bin/python",
+  "codePathLocal": "t11train.py",
+  "cpu_count": 128,
+  "cpu_count_logical": 256,
+  "disk": {
+    "/": {
+      "total": "1887976378368",
+      "used": "1472936374272"
+    }
+  },
+  "memory": {
+    "total": "1081980510208"
+  },
+  "cpu": {
+    "count": 128,
+    "countLogical": 256
+  }
+}
