@@ -14,6 +14,9 @@ task = Task.init(project_name="Mentor Group E/Group 3", task_name="OT2_RL_Traini
 task.set_base_docker('deanis/2023y2b-rl:latest')
 task.execute_remotely(queue_name="default")
 
+def log_to_clearml(step, metric_name, value):
+    task.get_logger().report_scalar(metric_name, "value", value=value, iteration=step)
+
 # WandB
 os.environ['WANDB_API_KEY'] = '11c5fccd0b07e41fc8bef045f744781d2f777121'
 run = wandb.init(project="RL_train",sync_tensorboard=True)
