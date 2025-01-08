@@ -1,8 +1,9 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import time
 import numpy as np
 from stable_baselines3 import PPO
 from t10envw_full_reward2 import OT2Env
-import os
 import wandb
 from wandb.integration.sb3 import WandbCallback
 import argparse
@@ -42,7 +43,7 @@ model = PPO(
     batch_size=args.batch_size, 
     n_steps=args.n_steps, 
     n_epochs=args.n_epochs,
-    gamme=args.gamma,
+    gamma=args.gamma,
     tensorboard_log=f"runs/{run.id}",
 )
 
