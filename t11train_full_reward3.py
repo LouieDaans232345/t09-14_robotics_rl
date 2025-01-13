@@ -45,7 +45,7 @@ model = PPO(
     n_steps=args.n_steps, 
     n_epochs=args.n_epochs,
     gamma=args.gamma,
-    clip_range=args.clip_range
+    clip_range=args.clip_range,
     tensorboard_log=f"runs/{run.id}",
 )
 
