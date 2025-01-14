@@ -30,14 +30,13 @@ class OT2Env(gym.Env):
         self.render = render
         self.max_steps = max_steps
         self.steps = 0
-        self.pipette_offset = self.sim.pipette_offset
 
         # Action space: controlling pipette in x, y, z directions
         self.action_space = spaces.Box(low=np.array([-1, -1, -1]), high=np.array([1, 1, 1]),
                                             shape=(3,), dtype=np.float32)
 
         # Observation space: pipette position (x, y, z) and goal position (x, y, z)
-        self.observation_space = spaces.Box(low=-math.inf, high=math.inf,
+        self.observation_space = spaces.Box(low=-np.inf, high=np.inf,
                                             shape=(6,), dtype=np.float32) # for one robot
 
     # RESET
@@ -51,9 +50,7 @@ class OT2Env(gym.Env):
         info = self.sim.reset(num_agents=1)
 
         # r1 - Observation
-        first_robot_key = list(info.keys())[0]
-        pipette_position = np.array(info[first_robot_key]["pipette_position"], dtype=np.float32)
-        observation = np.concatenate((pipette_position, self.goal_position)).astype(np.float32)
+        observation = np.concatenate((self.sim.get_pipette_position(self.sim.robotIds[0]), self.goal_position), axis=0).astype(np.float32) 
 
         # Reset variables
         self.steps = 0
@@ -70,9 +67,8 @@ class OT2Env(gym.Env):
         info = self.sim.run([action]) # expects list of actions [[x,y,z,drop], [x,y,z,drop], ...]
 
         # r1 - Observation
-        first_robot_key = list(info.keys())[0]
-        pipette_position = np.array(info[first_robot_key]["pipette_position"], dtype=np.float32)
-        observation = np.concatenate((pipette_position, self.goal_position)).astype(np.float32)
+        pipette_position = self.sim.get_pipette_position(self.sim.robotIds[0])
+        observation = pipette_position
 
         # r2 - Reward
         distance_to_goal = np.linalg.norm(pipette_position - self.goal_position)
@@ -90,12 +86,11 @@ class OT2Env(gym.Env):
         else:
             reward += distance_reward
         # -> add penalty for taking a step
-        reward -= 0.01
+        reward -= 0.005
 
         # r3 - Terminated
         threshold = 0.001
         if distance_to_goal < threshold: # if task has been completed
-            reward += 10  # Positive reward for success
             print(f'Treshold: {threshold}, Distance to goal: {distance_to_goal}')
             terminated = True
         else:
@@ -106,7 +101,9 @@ class OT2Env(gym.Env):
             truncated = True
         else:
             truncated = False
+
         self.steps += 1
+        observation = np.concatenate((pipette_position, self.goal_position), axis=0).astype(np.float32)
 
         return observation, reward, terminated, truncated, info
 
