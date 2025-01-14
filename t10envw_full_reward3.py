@@ -71,7 +71,7 @@ class OT2Env(gym.Env):
         observation = pipette_position
 
         # r2 - Reward
-        distance_to_goal = np.linalg.norm(pipette_position - self.goal_position)
+        distance_to_goal = np.linalg.norm(np.array(pipette_position) - np.array(self.goal_position))  # CHANGED THIS TO NP.ARRAY !
         if hasattr(self, 'previous_distance'):
             distance_reward = (self.previous_distance - distance_to_goal)
         else:
