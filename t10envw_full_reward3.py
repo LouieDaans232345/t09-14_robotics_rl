@@ -44,7 +44,9 @@ class OT2Env(gym.Env):
         if seed is not None:
             np.random.seed(seed)
         
-        self.goal_position = [random.uniform(self.x_min, self.x_max), random.uniform(self.y_min, self.y_max), random.uniform(self.z_min, self.z_max)]
+        self.goal_position = np.array([random.uniform(self.x_min, self.x_max),
+                                       random.uniform(self.y_min, self.y_max),
+                                       random.uniform(self.z_min, self.z_max)])
         
         # r2 - Info (+ reset)
         info = self.sim.reset(num_agents=1)
@@ -58,9 +60,10 @@ class OT2Env(gym.Env):
         return observation, info
 
     # STEP
-    def step(self, action):
+    def step(self, action): # TURN EVERYTHING INTO NP.ARRAY FOR BETTER CALCULATIONS
         
         # Append 0 for the drop action (since we're controlling only 3 actions: x, y, z)
+        action = np.array(action, dtype=np.float32) # CHANGED TO NP.ARRAY !
         action = np.append(action, 0)  # appending 0 for drop action
 
         # r5 - Info (+ run action)
@@ -68,30 +71,20 @@ class OT2Env(gym.Env):
 
         # r1 - Observation
         pipette_position = self.sim.get_pipette_position(self.sim.robotIds[0])
-        observation = pipette_position
 
         # r2 - Reward
         distance_to_goal = np.linalg.norm(np.array(pipette_position) - np.array(self.goal_position))  # CHANGED THIS TO NP.ARRAY !
-        if hasattr(self, 'previous_distance'):
-            distance_reward = (self.previous_distance - distance_to_goal)
-        else:
-            distance_reward = 0
-        self.previous_distance = distance_to_goal
+        distance_to_goal_no_array = np.linalg.norm(pipette_position - self.goal_position)
 
         # main reward -> negate the distance to goal
         reward = -distance_to_goal
-        # -> add bonus/penalty if closer to goal than before or not
-        if distance_reward <= 0:
-            reward += distance_reward
-        else:
-            reward += distance_reward
         # -> add penalty for taking a step
         reward -= 0.005
 
         # r3 - Terminated
         threshold = 0.001
-        if distance_to_goal < threshold: # if task has been completed
-            print(f'Treshold: {threshold}, Distance to goal: {distance_to_goal}')
+        if distance_to_goal_no_array < threshold: # if task has been completed
+            print(f'Treshold: {threshold}, Distance to goal: {distance_to_goal_no_array}')
             terminated = True
         else:
             terminated = False
