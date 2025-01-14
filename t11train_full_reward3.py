@@ -16,7 +16,7 @@ from typing_extensions import TypeIs
 env = OT2Env()
 
 # ClearML
-task = Task.init(project_name="Mentor Group E/Group 3", task_name="OT2_RL_Training_APP4_")
+task = Task.init(project_name="Mentor Group E/Group 3", task_name="Final_Tunable_Model")
 task.set_base_docker('deanis/2023y2b-rl:latest')
 task.execute_remotely(queue_name="default")
 
@@ -25,17 +25,18 @@ os.environ['WANDB_API_KEY'] = '11c5fccd0b07e41fc8bef045f744781d2f777121'
 run = wandb.init(project="RL_train_more_reward_v3",sync_tensorboard=True)
 
 # Create dir to store models
-model_dir = f"APP4_models/{run.id}"
+model_dir = f"models/{run.id}"
 os.makedirs(model_dir, exist_ok=True)
 
 # Arg parsing
 parser = argparse.ArgumentParser()
-parser.add_argument("--learning_rate", type=float, default=0.0003)
+parser.add_argument("--learning_rate", type=float, default=0.0001)
 parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--n_steps", type=int, default=2048)
 parser.add_argument("--n_epochs", type=int, default=20)
-parser.add_argument("--gamma", type=float, default=1)
+parser.add_argument("--gamma", type=float, default=0.99)
 parser.add_argument("--clip_range", type=float, default=0.2)
+parser.add_argument("--vf_coef", type=float, default=0.5)
 args = parser.parse_args()
 
 # Define PPO
@@ -49,6 +50,7 @@ model = PPO(
     n_epochs=args.n_epochs,
     gamma=args.gamma,
     clip_range=args.clip_range,
+    vf_coef=args.vf_coef,
     tensorboard_log=f"runs/{run.id}",
 )
 
@@ -56,15 +58,12 @@ model = PPO(
 # Classic Callback
 wandb_callback = WandbCallback(
     model_save_freq = 200_000,
-    model_save_path = f"APP4_models/{run.id}",
+    model_save_path = f"models/{run.id}",
     verbose = 2
 )
-
-model_dir = f"APP4_models/{run.id}"
-os.makedirs(model_dir, exist_ok=True)
 
 # Train
 timesteps = 1_000_000
 model.learn(total_timesteps=timesteps, callback=wandb_callback, reset_num_timesteps=False, progress_bar=True, tb_log_name=f"runs/{run.id}")
-model.save(f"APP4_models/{run.id}/{timesteps}_baseline")
-wandb.save(f"APP4_models/{run.id}/{timesteps}_baseline")
+model.save(f"models/{run.id}/{timesteps}_baseline")
+wandb.save(f"models/{run.id}/{timesteps}_baseline")
