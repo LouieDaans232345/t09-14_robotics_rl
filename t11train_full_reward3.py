@@ -2,7 +2,7 @@ import os
 import time
 import numpy as np
 from stable_baselines3 import PPO
-from t10envw_full_reward3 import OT2Env
+from t10envw_full_reward4 import OT2Env
 import wandb
 from wandb.integration.sb3 import WandbCallback
 import argparse
@@ -33,7 +33,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--learning_rate", type=float, default=0.0001)
 parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--n_steps", type=int, default=2048)
-parser.add_argument("--n_epochs", type=int, default=20)
+parser.add_argument("--n_epochs", type=int, default=30)
 parser.add_argument("--gamma", type=float, default=0.99)
 parser.add_argument("--clip_range", type=float, default=0.2)
 parser.add_argument("--vf_coef", type=float, default=0.5)
@@ -63,7 +63,7 @@ wandb_callback = WandbCallback(
 )
 
 # Train
-timesteps = 1_000_000
+timesteps = 5_000_000
 model.learn(total_timesteps=timesteps, callback=wandb_callback, reset_num_timesteps=False, progress_bar=True, tb_log_name=f"runs/{run.id}")
 model.save(f"models/{run.id}/{timesteps}_baseline")
 wandb.save(f"models/{run.id}/{timesteps}_baseline")
