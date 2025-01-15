@@ -37,7 +37,7 @@ parser.add_argument("--n_epochs", type=int, default=30)
 parser.add_argument("--gamma", type=float, default=0.99)
 parser.add_argument("--clip_range", type=float, default=0.2)
 parser.add_argument("--vf_coef", type=float, default=0.5)
-parser.add_argument("--timesteps", type=float, default=1_000_000)
+parser.add_argument("--timesteps", type=float, default=1_500_000)
 args = parser.parse_args()
 
 # Define PPO
@@ -65,5 +65,5 @@ wandb_callback = WandbCallback(
 
 # Train
 model.learn(total_timesteps=args.timesteps, callback=wandb_callback, reset_num_timesteps=False, progress_bar=True, tb_log_name=f"runs/{run.id}")
-model.save(f"models/{run.id}/{timesteps}_baseline")
-wandb.save(f"models/{run.id}/{timesteps}_baseline")
+model.save(f"models/{run.id}/{args.timesteps}_baseline")
+wandb.save(f"models/{run.id}/{args.timesteps}_baseline")

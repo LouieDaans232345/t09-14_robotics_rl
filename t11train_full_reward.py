@@ -34,7 +34,7 @@ parser.add_argument("--learning_rate", type=float, default=0.0001)
 parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--n_steps", type=int, default=2048)
 parser.add_argument("--n_epochs", type=int, default=10)
-parser.add_argument("--timesteps", type=int, default=1_000_000)
+parser.add_argument("--timesteps", type=int, default=1_500_000)
 args = parser.parse_args()
 
 # Define PPO
@@ -65,5 +65,5 @@ model.learn(
     progress_bar=True,
     tb_log_name=f"runs/{run.id}"
 )
-model.save(f"models/{run.id}/{timesteps}_baseline")
-wandb.save(f"models/{run.id}/{timesteps}_baseline")
+model.save(f"models/{run.id}/{args.timesteps}_baseline")
+wandb.save(f"models/{run.id}/{args.timesteps}_baseline")
