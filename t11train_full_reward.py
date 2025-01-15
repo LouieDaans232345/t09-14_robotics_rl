@@ -16,7 +16,7 @@ from typing_extensions import TypeIs
 env = OT2Env()
 
 # ClearML
-task = Task.init(project_name="Mentor Group E/Group 3", task_name="OT2_RL_Training_More_Reward")
+task = Task.init(project_name="Mentor Group E/Group 3", task_name="Final?")
 task.set_base_docker('deanis/2023y2b-rl:latest')
 task.execute_remotely(queue_name="default")
 
@@ -24,13 +24,18 @@ task.execute_remotely(queue_name="default")
 os.environ['WANDB_API_KEY'] = '11c5fccd0b07e41fc8bef045f744781d2f777121'
 run = wandb.init(project="RL_train_more_reward",sync_tensorboard=True)
 
+# Create dir to store models
+model_dir = f"models/{run.id}"
+os.makedirs(model_dir, exist_ok=True)
+
 # Arg parsing
 parser = argparse.ArgumentParser()
-parser.add_argument("--learning_rate", type=float, default=0.0005)
+parser.add_argument("--learning_rate", type=float, default=0.0001)
 parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--n_steps", type=int, default=2048)
 parser.add_argument("--n_epochs", type=int, default=10)
-args, _ = parser.parse_known_args()
+parser.add_argument("--timesteps", type=int, default=1_000_000)
+args = parser.parse_args()
 
 # Define PPO
 model = PPO(
@@ -53,4 +58,12 @@ wandb_callback = WandbCallback(
 )
 
 # Train
-model.learn(total_timesteps=1_000_000, callback=wandb_callback, progress_bar=True, tb_log_name=f"runs/{run.id}")
+model.learn(
+    total_timesteps=args.timesteps,
+    callback=wandb_callback,
+    reset_num_timesteps=False,
+    progress_bar=True,
+    tb_log_name=f"runs/{run.id}"
+)
+model.save(f"models/{run.id}/{timesteps}_baseline")
+wandb.save(f"models/{run.id}/{timesteps}_baseline")

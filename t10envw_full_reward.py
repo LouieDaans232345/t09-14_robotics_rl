@@ -4,7 +4,7 @@ from gymnasium import spaces
 from sim_class import Simulation
 import random
 import math
-import functions as do
+import rl_functions as do
 
 
 class OT2Env(gym.Env):
@@ -30,7 +30,6 @@ class OT2Env(gym.Env):
         self.render = render
         self.max_steps = max_steps
         self.steps = 0
-        self.pipette_offset = self.sim.pipette_offset
 
         # Action space: controlling pipette in x, y, z directions
         self.action_space = spaces.Box(low=np.array([-1, -1, -1]), high=np.array([1, 1, 1]),
@@ -62,17 +61,17 @@ class OT2Env(gym.Env):
 
         # main reward -> negate the distance to goal
         reward = -distance_to_goal
-        # -> add bonus/penalty if closer to goal than before or not
-        reward += distance_reward * 2
+        # -> add penalty if not closer to goal than before
+        if distance_reward < 0:
+            reward += distance_reward
         # -> add penalty for taking a step
-        step_penalty = -0.05
-        reward += step_penalty
+        reward -= 0.05
 
         # r3 - Terminated
         threshold = 0.001
         if distance_to_goal < threshold: # if task has been completed
             terminated = True
-            reward += 10  # Positive reward for success
+            reward += 1  # Positive reward for success
             print(f'Treshold: {threshold}, Distance to goal: {distance_to_goal}')
         else:
             terminated = False
